@@ -1,47 +1,12 @@
-content: fields.document({
-    label: 'Content',
-    links: true,
-    layouts: [[1], [1, 1]],
-    images: {
-      directory: 'src/content/blog/_images',
-      publicPath: '/src/content/blog/_images/',
-      schema: {
-        title: fields.text({
-          label: 'Caption',
-          description:
-            'The text to display under the image in a caption.',
-        }),
-      },
-    },
-    dividers: true,
-    formatting: {
-      alignment: true,
-      blockTypes: true,
-      headingLevels: true,
-      inlineMarks: {
-        code: true,
-        bold: true,
-        italic: true,
-        underline: true,
-        strikethrough: true,
-      },
-      listTypes: true,
-    },
-    tables: true,
-  }),
+Today I had an idea for an alternative approach to send session duration information. Below I will describe two approaches. The first one is already implemeted, the second one is my alternative approach.
 
-  Once you have configured nginx and unpacked the shell artifact you will need to fill out its configuration, which is located in the root of the artifact inside the env.js file.
+First approach: the frontend sends a separate metric, which will be called “session” and will have a start time and duration. And you can use it as is.  
 
-  The configuration looks like this:
-  
-  APP_NAME field - will be used in various parts of the application, in modal windows and notifications.
-  APP_ENV field - used to display the env name badge. please use null if you want to hide this badge.
-  APP_LOGO field - specifies the path to your application's logo. Both global and relative paths to the logo are supported. But it is best to place your logo in the "assets/images" folder in the artifact folder.
-  AUTH_PAGE_LOGO field - specifies the path to the logo that will be displayed on the authentication page. This field is optional, if you don't fill it in, the main logo (APP_LOGO) will be used by default.
-  APP_PAGES field - specifies the endpoint that the shell will use when requesting information about pages from the flask api. This means that you must implement a GET endpoint that will return page information.
-  The response should be in the following format:
-  
-  id: - unique id;
-  label - the name that will be displayed on the navigation bar.
-  icon - icon that will be displayed on the navigation bar. this field is optional, if no icon is specified, the default icon will be used.
-  endpoint - in your case this is the endpoint where the corresponding Dash page is located.
+The second approach is a bit more complex, but as I think more flexible, because it will not only get the duration of sessions, but also know what metrics were during the session.
+The second approach:
+We need to add “session_id” to MetricsUploadParameters and the frontend will fill this field.
+To get the session duration you will need to do the following:
+1. Group the metrics for the time period by “session_id”;
+2. Calculate the duration for each of the sessions. (duration = last_metric_in_session.startTimestamp - first_metric_in_session.startTimestamp);
+
+I'd like to know your opinion, and what approach would be convenient for you.
